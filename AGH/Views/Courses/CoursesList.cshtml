@@ -1,0 +1,81 @@
+﻿@model IEnumerable<AGH.Course>
+
+@{
+    ViewBag.Title = "Courses List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    td{
+        font-size:1.7rem;
+    }
+</style>
+<h2>Courses List</h2>
+
+<table class="table table-striped">
+    <thead class="bg-info">
+        <tr>
+            <th>
+                Course Name
+            </th>
+            <th>
+                Course Code
+            </th>
+            <th>
+                Course Description
+            </th>
+            <th>
+                Course Credit
+            </th>
+            <th>
+                Instructor Name
+            </th>
+            <th>
+                Assistant Name
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem=>item.Course_Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem=>item.Course_Code)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem=>item.Course_Description)
+            </td>
+            <td style="text-align:center">
+                <span class="badge">
+                    @Html.DisplayFor(modelItem=>item.Course_Credit)
+                </span>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem=>item.Instructor.User.User_First_Name)
+                @Html.DisplayFor(modelItem=>item.Instructor.User.User_Last_Name)
+
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem=>item.Assistant.User.User_First_Name)
+                @Html.DisplayFor(modelItem=>item.Assistant.User.User_Last_Name)
+            </td>
+            <td>
+                @Html.ActionLink("Details", "CourseDetails", new { id = item.CourseID }) |
+                @Html.ActionLink("Edit", "EditCourse", new { id = item.CourseID }) |
+                @Html.ActionLink("Delete", "DeleteCourse", new { id = item.CourseID })
+            </td>
+        </tr>
+        }
+
+    </tbody>
+</table>
+
+<div style="direction:rtl"> 
+    @Html.ActionLink("Add a new course", "CreateCourse", null, new { @class = "btn btn-primary" })
+</div>
