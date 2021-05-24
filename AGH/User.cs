@@ -9,21 +9,22 @@
 
 namespace AGH
 {
-    using Newtonsoft.Json;
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using System.Collections.Generic;
     using System.Runtime.Serialization;
+    using Newtonsoft.Json;
 
     public partial class User
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public User()
         {
-            this.Assistants = new HashSet<Assistant>();
-            this.Instructors = new HashSet<Instructor>();
-            this.Students = new HashSet<Student>();
+            //this.Assistants = new HashSet<Assistant>();
+            //this.Instructors = new HashSet<Instructor>();
+            //this.Students = new HashSet<Student>();
         }
+    
         public int ID { get; set; }
         public int User_Type_ID { get; set; }
         public string User_First_Name { get; set; }
@@ -32,15 +33,15 @@ namespace AGH
         public string User_Email { get; set; }
         public int User_ID { get; set; }
         public string User_Password { get; set; }
-    
+        public bool Is_User_Deleted { get; set; }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         [JsonIgnore]
         [IgnoreDataMember]
         public virtual ICollection<Assistant> Assistants { get; set; }
-
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         [JsonIgnore]
         [IgnoreDataMember]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Instructor> Instructors { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         [JsonIgnore]

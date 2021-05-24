@@ -27,6 +27,7 @@ namespace AGH
         public int Course_Credit { get; set; }
         public int Course_Instructor_ID { get; set; }
         public int Course_Assistant_ID { get; set; }
+        public bool Is_Course_Deleted { get; set; }
     
         public virtual Assistant Assistant { get; set; }
         public virtual Instructor Instructor { get; set; }

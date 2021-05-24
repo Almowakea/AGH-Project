@@ -27,7 +27,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.User_First_Name, "User First Name", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.User_First_Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.User_First_Name, new { htmlAttributes = new { @class = "form-control", @placeholder = "Jon" } })
                 @Html.ValidationMessageFor(model => model.User_First_Name, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -35,7 +35,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.User_Last_Name, "User Last Name", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.User_Last_Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.User_Last_Name, new { htmlAttributes = new { @class = "form-control", @placeholder = "Doe" } })
                 @Html.ValidationMessageFor(model => model.User_Last_Name, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -43,7 +43,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.User_Phone_Number, "User Phone Number", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.User_Phone_Number, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.User_Phone_Number, new { htmlAttributes = new { @class = "form-control", @placeholder = "99849948" } })
                 @Html.ValidationMessageFor(model => model.User_Phone_Number, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -51,7 +51,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.User_Email, "User Email", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.User_Email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.User_Email, new { htmlAttributes = new { @class = "form-control", @placeholder = "example@example.com" } })
                 @Html.ValidationMessageFor(model => model.User_Email, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -68,22 +68,18 @@
             @Html.LabelFor(model => model.User_Password, "User Password", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.PasswordFor(model => model.User_Password, htmlAttributes: new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.User_Password, "This field is required", new { @class = "text-danger" })
+                @Html.ValidationMessageFor(model => model.User_Password, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="Create" class="btn btn-success" />
             </div>
         </div>
     </div>
 }
 
 <div>
-    @Html.ActionLink("Back to List", "UsersList")
+    @Html.ActionLink("Back to List", "UsersList", null, new { @class = "btn btn-default" })
 </div>
-
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-}

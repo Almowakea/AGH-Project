@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="aba022_sampleModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="aba022_sampleModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Assistant">
           <Key>
             <PropertyRef Name="ID" />
@@ -25,6 +25,7 @@
           <Property Name="Course_Credit" Type="int" Nullable="false" />
           <Property Name="Course_Instructor_ID" Type="int" Nullable="false" />
           <Property Name="Course_Assistant_ID" Type="int" Nullable="false" />
+          <Property Name="Is_Course_Deleted" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="Instructor">
           <Key>
@@ -63,6 +64,7 @@
           <Property Name="User_Email" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="User_ID" Type="int" Nullable="false" />
           <Property Name="User_Password" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Is_User_Deleted" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="User_Type">
           <Key>
@@ -208,8 +210,7 @@
             <End Role="User" EntitySet="User" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="aba022_sampleModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -238,6 +239,7 @@
           <NavigationProperty Name="Assistant" Relationship="Self.FK_Course_Assistant" FromRole="Course" ToRole="Assistant" />
           <NavigationProperty Name="Instructor" Relationship="Self.FK_Course_Instrctor" FromRole="Course" ToRole="Instructor" />
           <NavigationProperty Name="Student_Course" Relationship="Self.FK_Student_Course_Course" FromRole="Course" ToRole="Student_Course" />
+          <Property Name="Is_Course_Deleted" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="Instructor">
           <Key>
@@ -286,6 +288,7 @@
           <NavigationProperty Name="Instructors" Relationship="Self.FK_Instrctor_User" FromRole="User" ToRole="Instructor" />
           <NavigationProperty Name="Students" Relationship="Self.FK_Student_User" FromRole="User" ToRole="Student" />
           <NavigationProperty Name="User_Type" Relationship="Self.FK_User_User" FromRole="User" ToRole="User_Type" />
+          <Property Name="Is_User_Deleted" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="User_Type">
           <Key>
@@ -451,6 +454,7 @@
           <EntitySetMapping Name="Courses">
             <EntityTypeMapping TypeName="aba022_sampleModel.Course">
               <MappingFragment StoreEntitySet="Course">
+                <ScalarProperty Name="Is_Course_Deleted" ColumnName="Is_Course_Deleted" />
                 <ScalarProperty Name="CourseID" ColumnName="CourseID" />
                 <ScalarProperty Name="Course_Name" ColumnName="Course_Name" />
                 <ScalarProperty Name="Course_Code" ColumnName="Course_Code" />
@@ -492,6 +496,7 @@
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="aba022_sampleModel.User">
               <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="Is_User_Deleted" ColumnName="Is_User_Deleted" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="User_Type_ID" ColumnName="User_Type_ID" />
                 <ScalarProperty Name="User_First_Name" ColumnName="User_First_Name" />

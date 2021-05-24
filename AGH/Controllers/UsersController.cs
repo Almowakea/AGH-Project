@@ -11,6 +11,7 @@ using AGH.Models;
 
 namespace AGH.Controllers
 {
+    [AuthorizeAdminOnly]
     public class UsersController : Controller
     {
         private AGH_DBContext db = new AGH_DBContext();
@@ -18,30 +19,57 @@ namespace AGH.Controllers
         // GET: Users
         public ActionResult UsersList()
         {
-            var users = db.Users.Include(u => u.User_Type);
-            return View(users.ToList());
+            try
+            {
+                var users = db.Users.Include(u => u.User_Type).Where(u => u.Is_User_Deleted != true);
+                return View(users.ToList());
+            }
+               
+            catch (Exception e)
+            {
+                ViewBag.ErrorMessage = "the following error occured: " + e.Message;
+                return View("Error");
+            }
+            
         }
 
         // GET: Users/Details/5
         public ActionResult UserDetails(int? id)
         {
-            if (id == null)
+            if (id is null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            User user = db.Users.Find(id);
-            if (user == null)
+            try
             {
-                return HttpNotFound();
+                User user = db.Users.Find(id);
+                if (user is null || user.Is_User_Deleted)
+                {
+                    return HttpNotFound();
+                }
+                return View(user);
             }
-            return View(user);
+
+            catch (Exception e)
+            {
+                ViewBag.ErrorMessage = "the following error occured: " + e.Message;
+                return View("Error");
+            }
         }
 
         // GET: Users/Create
         public ActionResult CreateUser()
         {
-            ViewBag.User_Type_ID = new SelectList(db.User_Type, "ID", "Type");
-            return View();
+            try
+            {
+                ViewBag.User_Type_ID = new SelectList(db.User_Type, "ID", "Type");
+                return View();
+            }
+            catch (Exception e)
+            {
+                ViewBag.ErrorMessage = "the following error occured: " + e.Message;
+                return View("Error");
+            }
         }
 
         // POST: Users/Create
@@ -51,31 +79,52 @@ namespace AGH.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CreateUser([Bind(Include = "ID,User_Type_ID,User_First_Name,User_Last_Name,User_Phone_Number,User_Email,User_ID,User_Password")] User user)
         {
-            if (ModelState.IsValid)
+            try
             {
-                db.Users.Add(user);
-                db.SaveChanges();
-                return RedirectToAction("UsersList");
+                ViewBag.User_Type_ID = new SelectList(db.User_Type, "ID", "Type", user.User_Type_ID);
+
+                if (ModelState.IsValid)
+                {
+                    db.Users.Add(user);
+                    db.SaveChanges();
+                    return RedirectToAction("UsersList");
+                }
+
+                return View(user);
             }
 
-            ViewBag.User_Type_ID = new SelectList(db.User_Type, "ID", "Type", user.User_Type_ID);
-            return View(user);
+            catch (Exception e)
+            {
+                ViewBag.ErrorMessage = "the following error occured: " + e.Message;
+                return View("Error");
+            }
         }
 
         // GET: Users/Edit/5
         public ActionResult EditUser(int? id)
         {
-            if (id == null)
+            try
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                User user = db.Users.Find(id);
+                ViewBag.User_Type_ID = new SelectList(db.User_Type, "ID", "Type", user.User_Type_ID);
+                if (id is null || user.Is_User_Deleted)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                }
+
+                if (user is null)
+                {
+                    return HttpNotFound();
+                }
+
+                return View(user);
             }
-            User user = db.Users.Find(id);
-            if (user == null)
+
+            catch (Exception e)
             {
-                return HttpNotFound();
+                ViewBag.ErrorMessage = "the following error occured: " + e.Message;
+                return View("Error");
             }
-            ViewBag.User_Type_ID = new SelectList(db.User_Type, "ID", "Type", user.User_Type_ID);
-            return View(user);
         }
 
         // POST: Users/Edit/5
@@ -91,6 +140,7 @@ namespace AGH.Controllers
                 db.SaveChanges();
                 return RedirectToAction("UsersList");
             }
+
             ViewBag.User_Type_ID = new SelectList(db.User_Type, "ID", "Type", user.User_Type_ID);
             return View(user);
         }
@@ -98,34 +148,55 @@ namespace AGH.Controllers
         // GET: Users/Delete/5
         public ActionResult DeleteUser(int? id)
         {
-            if (id == null)
+            try
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            User user = db.Users.Find(id);
-            db.Users.Remove(user);
-            db.SaveChanges();
+                User user = db.Users.Find(id);
+                
+                if (id is null)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                }
 
-            if (user == null)
-            {
-                return HttpNotFound();
+                if (user.Is_User_Deleted)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.NotFound);
+                }
+
+                return View(user);
             }
-            return View(user);
+            catch (Exception)
+            {
+                //One way of throwing exception "Didn't generalize because it reveals info to users"
+                throw new Exception("delete operation unsuccessful (user not found)");
+            }
         }
 
         // POST: Users/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("DeleteUser")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            User user = db.Users.Find(id);
-            db.Users.Remove(user);
-            db.SaveChanges();
-            return RedirectToAction("UsersList");
+            try
+            {
+                User user = db.Users.Find(id);
+
+                
+
+                user.Is_User_Deleted = true;
+                db.SaveChanges();
+                return RedirectToAction("UsersList");
+            }
+            catch (Exception e)
+            {
+                ViewBag.ErrorMessage = "the following error occured: " + e.Message;
+                return View("Error");
+            }
+
         }
 
         protected override void Dispose(bool disposing)
         {
+            //Should this also be wrapped in Try/Catch
             if (disposing)
             {
                 db.Dispose();

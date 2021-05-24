@@ -1,4 +1,4 @@
-﻿@model AGH.User
+﻿@model AGH.Models.DTO.userLogin
 
 @{
     ViewBag.Title = "Login";
@@ -13,28 +13,22 @@
 
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true)
-        @if (@ViewBag.Message != null)
+        @*@if (@ViewBag.Message != null)
         {
             <div style="border: 1px solid red">
                 @ViewBag.Message
             </div>
-        }
+        }*@
         <table>
             <tr>
                 <td>@Html.LabelFor(a => a.User_ID, "User ID Number:", htmlAttributes: new { @class = "control-label col-md" })</td>
                 <td>@Html.EditorFor(a => a.User_ID, new { htmlAttributes = new { @class = "form-control" } })</td>
-                <td>@Html.ValidationMessageFor(a => a.User_ID, "User ID field is required", new { @class = "text-danger" })</td>
+                <td>@Html.ValidationMessageFor(a => a.User_ID, "User ID number is required", new { @class = "text-danger" })</td>
             </tr>
             <tr>
-                <td>
-                    @Html.LabelFor(a => a.User_Password, "User Password:", htmlAttributes: new { @class = "control-label col-md" })
-                </td>
-                <td>
-                    @Html.PasswordFor(a => a.User_Password, htmlAttributes: new { @class = "form-control" })
-                </td>
-                <td>
-                    @Html.ValidationMessageFor(a => a.User_Password, "Please enter your password", new { @class = "text-danger" })
-                </td>
+                <td>@Html.LabelFor(a => a.User_Password, "User Password:", htmlAttributes: new { @class = "control-label col-md" })</td>
+                <td>@Html.PasswordFor(a => a.User_Password, htmlAttributes: new { @class = "form-control" })</td>
+                <td>@Html.ValidationMessageFor(a => a.User_Password, " Please enter your password", new { @class = "text-danger col-md" })</td>
             </tr>
             <tr>
                 <td></td>
@@ -45,8 +39,4 @@
             </tr>
         </table>
     </div>
-}
-
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
 }
