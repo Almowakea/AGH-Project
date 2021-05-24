@@ -156,7 +156,6 @@
     <Compile Include="Assistant.cs">
       <DependentUpon>AbetModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Controllers\ApiViewsController.cs" />
     <Compile Include="Controllers\API\UsersController.cs" />
     <Compile Include="Controllers\CoursesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -172,6 +171,9 @@
     </Compile>
     <Compile Include="Models\AuthorizeAdminOnly.cs" />
     <Compile Include="Models\CustomAuthorize.cs" />
+    <Compile Include="Models\DTO\userLogin.cs" />
+    <Compile Include="Models\Entity Class Data Annotations\Course.cs" />
+    <Compile Include="Models\Entity Class Data Annotations\User.cs" />
     <Compile Include="Models\RoleDetector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Student.cs">

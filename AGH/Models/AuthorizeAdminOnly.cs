@@ -13,10 +13,10 @@ namespace AGH.Models
         protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
         {
             //Unauthorized users IDs, Instructor = 1, Assistant = 2, Student = 3
-            var roleIDs = new List<int>() { 1, 2, 3 };
+            var roleIDs = new List<int>() { 4 }; // Admin Role ID = 4
 
             // If user is not ADMIN, handle accordingly
-            if (roleIDs.Contains((Int32)HttpContext.Current.Session["UserRoleID"]))
+            if (!roleIDs.Contains((Int32)HttpContext.Current.Session["UserRoleID"]))
             {
                 filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary{
                     { "Action", "Contact" },

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using AGH.ViewModel;
+using AGH.Models.DTO;
 using System.Web.Security;
 
 namespace AGH.Controllers
@@ -20,13 +21,15 @@ namespace AGH.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public ActionResult Login(User objUser)
+        public ActionResult Login(userLogin objUser)
+
         {
+            var error = ModelState.Values;
             if (ModelState.IsValid)
             {
                 using (AGH_DBContext db = new AGH_DBContext())
                 {
-                    var obj = db.Users.Where(a => a.User_ID.Equals(objUser.User_ID) && a.User_Password.Equals(objUser.User_Password)).FirstOrDefault();
+                    var obj = db.Users.Where(a => a.User_ID.Equals(objUser.User_ID) && a.User_Password.Equals(objUser.User_Password) && a.Is_User_Deleted == false).FirstOrDefault();
                     if (obj != null)
                     {
                         Session["UserID"] = obj.User_ID;
@@ -36,6 +39,7 @@ namespace AGH.Controllers
                     return RedirectToAction("Index");
                 }
             }
+            ViewBag.Message = "Something wrong happened";
             return View(objUser);
         }
 
@@ -43,24 +47,14 @@ namespace AGH.Controllers
         {
             FormsAuthentication.SignOut();
             Session.Abandon(); //Clear & Terminate Session Object
-            return RedirectToAction("Login", "Home");
+            return RedirectToAction("Login");
         }
 
         public ActionResult Index()
         {
-            var show = new ShowLinks();
+            //var show = new ShowLinks();
 
-            //if ((Int32)Session["UserRoleID"] == 4)
-            //{
-            //    show.showHiddenLinks = true;
-            //}
-
-            //else
-            //{
-            //    show.showHiddenLinks = false;
-            //}
-
-            return View(show);
+            return View();
 
         }
         public ActionResult About()

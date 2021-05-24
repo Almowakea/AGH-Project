@@ -37,7 +37,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Course_Description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Course_Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.TextAreaFor(model => model.Course_Description, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.Course_Description, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -51,7 +51,7 @@
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.Course_Instructor_ID, "Course_Instructor_ID", htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.Course_Instructor_ID, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.DropDownList("Course_Instructor_ID", null, htmlAttributes: new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.Course_Instructor_ID, "", new { @class = "text-danger" })
@@ -59,7 +59,7 @@
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.Course_Assistant_ID, "Course_Assistant_ID", htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.Course_Assistant_ID, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.DropDownList("Course_Assistant_ID", null, htmlAttributes: new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.Course_Assistant_ID, "", new { @class = "text-danger" })
@@ -77,7 +77,3 @@
 <div>
     @Html.ActionLink("Back to List", "CoursesList")
 </div>
-
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-}
