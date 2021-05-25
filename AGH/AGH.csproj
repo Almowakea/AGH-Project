@@ -175,6 +175,7 @@
     <Compile Include="Models\Entity Class Data Annotations\Course.cs" />
     <Compile Include="Models\Entity Class Data Annotations\User.cs" />
     <Compile Include="Models\RoleDetector.cs" />
+    <Compile Include="Services\HashPasswordService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Student.cs">
       <DependentUpon>AbetModel.tt</DependentUpon>
@@ -499,6 +500,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Base\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

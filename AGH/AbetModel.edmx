@@ -63,8 +63,9 @@
           <Property Name="User_Phone_Number" Type="nvarchar" MaxLength="20" Nullable="false" />
           <Property Name="User_Email" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="User_ID" Type="int" Nullable="false" />
-          <Property Name="User_Password" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="User_Password" Type="nvarchar(max)" Nullable="false" />
           <Property Name="Is_User_Deleted" Type="bit" Nullable="false" />
+          <Property Name="User_Password_Salt" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="User_Type">
           <Key>
@@ -283,12 +284,13 @@
           <Property Name="User_Phone_Number" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="User_Email" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="User_ID" Type="Int32" Nullable="false" />
-          <Property Name="User_Password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="User_Password" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="Assistants" Relationship="Self.FK_Assistant_User" FromRole="User" ToRole="Assistant" />
           <NavigationProperty Name="Instructors" Relationship="Self.FK_Instrctor_User" FromRole="User" ToRole="Instructor" />
           <NavigationProperty Name="Students" Relationship="Self.FK_Student_User" FromRole="User" ToRole="Student" />
           <NavigationProperty Name="User_Type" Relationship="Self.FK_User_User" FromRole="User" ToRole="User_Type" />
           <Property Name="Is_User_Deleted" Type="Boolean" Nullable="false" />
+          <Property Name="User_Password_Salt" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="User_Type">
           <Key>
@@ -496,6 +498,7 @@
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="aba022_sampleModel.User">
               <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="User_Password_Salt" ColumnName="User_Password_Salt" />
                 <ScalarProperty Name="Is_User_Deleted" ColumnName="Is_User_Deleted" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="User_Type_ID" ColumnName="User_Type_ID" />

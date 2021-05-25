@@ -6,8 +6,15 @@
 </head>
 <body>
     <hgroup>
-        <h1>Error.</h1>
-        <h2>An error occurred while processing your request.</h2>
+        <h2>
+            The following error has occured: 
+        </h2>
+        <h3 style="color: red">
+            @if (ViewBag.ErrorMessage != null)
+            {
+                    @ViewBag.ErrorMessage
+            }
+        </h3>
     </hgroup>
 </body>
 </html>

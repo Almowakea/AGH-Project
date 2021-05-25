@@ -1,12 +1,9 @@
-﻿using AGH.Models;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using AGH.ViewModel;
 using AGH.Models.DTO;
 using System.Web.Security;
+using AGH.Services;
 
 namespace AGH.Controllers
 {
@@ -24,23 +21,44 @@ namespace AGH.Controllers
         public ActionResult Login(userLogin objUser)
 
         {
-            var error = ModelState.Values;
-            if (ModelState.IsValid)
+            //var error = ModelState.Values;
+            try
             {
-                using (AGH_DBContext db = new AGH_DBContext())
+                if (ModelState.IsValid)
                 {
-                    var obj = db.Users.Where(a => a.User_ID.Equals(objUser.User_ID) && a.User_Password.Equals(objUser.User_Password) && a.Is_User_Deleted == false).FirstOrDefault();
-                    if (obj != null)
+                    using (AGH_DBContext db = new AGH_DBContext())
                     {
-                        Session["UserID"] = obj.User_ID;
-                        Session["UserRoleID"] = obj.User_Type.ID;
-                        Session["UserName"] = obj.User_First_Name.ToString() + " " + obj.User_Last_Name.ToString();
+                        var obj = db.Users.Where(a => a.User_ID.Equals(objUser.User_ID)).FirstOrDefault();
+
+                        if(obj.Is_User_Deleted == false)
+                        {
+                            // Checks if entered password matches the password in DB
+                            if (HashPasswordService.CompareHash(objUser.User_Password, obj.User_Password_Salt, obj.User_Password))
+                            {
+                                Session["UserID"] = obj.User_ID;
+                                Session["UserRoleID"] = obj.User_Type.ID;
+                                Session["UserName"] = obj.User_First_Name.ToString() + " " + obj.User_Last_Name.ToString();
+
+                                return RedirectToAction("Index");
+                            }
+
+                            ViewBag.LoginErrorMessage = "Please check your login credentials and try again";
+                            return View("Login");
+                        }
+
+                        ViewBag.LoginErrorMessage = "Your user has been deactivated. GET LOST!";
+                        return View("Login");
                     }
-                    return RedirectToAction("Index");
                 }
+
+                return View(objUser);
             }
-            ViewBag.Message = "Something wrong happened";
-            return View(objUser);
+
+            catch (Exception e)
+            {
+                ViewBag.ErrorMessage = e.Message;
+                return View("Error");
+            }
         }
 
         public ActionResult LogOut()

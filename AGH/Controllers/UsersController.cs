@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using AGH;
+using AGH.Services;
 using AGH.Models;
 
 namespace AGH.Controllers
@@ -27,7 +25,7 @@ namespace AGH.Controllers
                
             catch (Exception e)
             {
-                ViewBag.ErrorMessage = "the following error occured: " + e.Message;
+                ViewBag.ErrorMessage = e.Message;
                 return View("Error");
             }
             
@@ -52,7 +50,7 @@ namespace AGH.Controllers
 
             catch (Exception e)
             {
-                ViewBag.ErrorMessage = "the following error occured: " + e.Message;
+                ViewBag.ErrorMessage = e.Message;
                 return View("Error");
             }
         }
@@ -67,7 +65,7 @@ namespace AGH.Controllers
             }
             catch (Exception e)
             {
-                ViewBag.ErrorMessage = "the following error occured: " + e.Message;
+                ViewBag.ErrorMessage = e.Message;
                 return View("Error");
             }
         }
@@ -85,6 +83,23 @@ namespace AGH.Controllers
 
                 if (ModelState.IsValid)
                 {
+                    //using (SHA512 sha512Hash = SHA512.Create())
+                    //{
+                    //    // Generate unique salt for each user
+                    //    user.User_Password_Salt = Crypto.GenerateSalt();
+
+                    //    // From String to byte array + salt
+                    //    byte[] sourceBytes = Encoding.UTF8.GetBytes(user.User_Password + user.User_Password_Salt);
+                    //    byte[] hashBytes = sha512Hash.ComputeHash(sourceBytes);
+
+                    //    // Converting hashed byte array back to string format
+                    //    user.User_Password = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
+                    //}
+
+                    user.User_Password_Salt = HashPasswordService.CreateSalt();
+
+                    user.User_Password = HashPasswordService.CreateHash(user.User_Password, user.User_Password_Salt);
+
                     db.Users.Add(user);
                     db.SaveChanges();
                     return RedirectToAction("UsersList");
@@ -95,7 +110,7 @@ namespace AGH.Controllers
 
             catch (Exception e)
             {
-                ViewBag.ErrorMessage = "the following error occured: " + e.Message;
+                ViewBag.ErrorMessage = e.Message;
                 return View("Error");
             }
         }
@@ -111,18 +126,18 @@ namespace AGH.Controllers
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
                 }
-
+            
                 if (user is null)
                 {
                     return HttpNotFound();
                 }
 
-                return View(user);
+                return View(user);    
             }
 
             catch (Exception e)
             {
-                ViewBag.ErrorMessage = "the following error occured: " + e.Message;
+                ViewBag.ErrorMessage = e.Message;
                 return View("Error");
             }
         }
@@ -136,6 +151,10 @@ namespace AGH.Controllers
         {
             if (ModelState.IsValid)
             {
+                user.User_Password_Salt = HashPasswordService.CreateSalt();
+
+                user.User_Password = HashPasswordService.CreateHash(user.User_Password, user.User_Password_Salt);
+
                 db.Entry(user).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("UsersList");
@@ -188,7 +207,7 @@ namespace AGH.Controllers
             }
             catch (Exception e)
             {
-                ViewBag.ErrorMessage = "the following error occured: " + e.Message;
+                ViewBag.ErrorMessage = e.Message;
                 return View("Error");
             }
 
