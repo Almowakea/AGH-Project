@@ -6,6 +6,12 @@ using System.Net;
 using System.Web.Mvc;
 using AGH.Services;
 using AGH.Models;
+using iTextSharp.text;
+using System.Web;
+using System.IO;
+using iTextSharp.text.pdf;
+using iTextSharp.text.html.simpleparser;
+using System.Text;
 
 namespace AGH.Controllers
 {
@@ -20,15 +26,16 @@ namespace AGH.Controllers
             try
             {
                 var users = db.Users.Include(u => u.User_Type).Where(u => u.Is_User_Deleted != true);
+
                 return View(users.ToList());
             }
-               
+
             catch (Exception e)
             {
                 ViewBag.ErrorMessage = e.Message;
                 return View("Error");
             }
-            
+
         }
 
         // GET: Users/Details/5
@@ -126,13 +133,13 @@ namespace AGH.Controllers
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
                 }
-            
+
                 if (user is null)
                 {
                     return HttpNotFound();
                 }
 
-                return View(user);    
+                return View(user);
             }
 
             catch (Exception e)
@@ -170,7 +177,7 @@ namespace AGH.Controllers
             try
             {
                 User user = db.Users.Find(id);
-                
+
                 if (id is null)
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -199,12 +206,13 @@ namespace AGH.Controllers
             {
                 User user = db.Users.Find(id);
 
-                
-
                 user.Is_User_Deleted = true;
+
                 db.SaveChanges();
+
                 return RedirectToAction("UsersList");
             }
+
             catch (Exception e)
             {
                 ViewBag.ErrorMessage = e.Message;
@@ -212,6 +220,105 @@ namespace AGH.Controllers
             }
 
         }
+
+        public byte[] GeneratePDF(string pHTML)
+        {
+            byte[] bytePDF = null;
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                TextReader txtReader = new StringReader(pHTML);
+
+                // itextsharp object from document class
+                // Page size & margins
+                using (Document doc = new Document(PageSize.A4, 25, 25, 25, 25))
+                {
+                    // Create an itextsharp pdfWriter that listens to the document and directs an XML-stream to a file
+                    using (PdfWriter oPdfWriter = PdfWriter.GetInstance(doc, ms))
+                    {
+
+                        // Create a worker to parse the document
+                        HTMLWorker htmlWorker = new HTMLWorker(doc);
+
+                        // Open document and start the worker on the document
+                        doc.Open();
+
+                        doc.HtmlStyleClass = "table";
+
+                        htmlWorker.StartDocument();
+
+                        // Parse the html into the document
+                        htmlWorker.Parse(txtReader);
+
+                        // Close the document and the worker
+                        htmlWorker.EndDocument();
+                        htmlWorker.Close();
+                        doc.Close();
+
+                        bytePDF = ms.ToArray();
+
+                        return bytePDF;
+                    }
+                }
+            }
+        }
+
+        public void DownloadPDF()
+        {
+            //string HTMLContent = "Hello <b>World</b>";
+            var sb = new StringBuilder();
+            sb.Append(@"<html>
+<head>
+</head>
+<body>
+<table class='table bordered'>
+        <tr>
+            <th>
+                First Name
+            </th>
+            <th>
+                Last Name
+            </th>
+            <th>
+                Phone Number
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                ID Number
+            </th>
+            <th>
+                Role
+            </th>
+        </tr>");
+
+            var users = db.Users.Include(u => u.User_Type).Where(u => u.Is_User_Deleted != true);
+
+            foreach (var user in users)
+            {
+                sb.AppendFormat($@"<tr>
+<td>{user.User_First_Name}</td>
+<td>{user.User_Last_Name}</td>
+<td>{user.User_Phone_Number}</td>
+<td>{user.User_Email}</td>
+<td>{user.User_ID}</td>
+<td>{user.User_Type.Type}</td>
+    </tr>");
+            }
+
+            sb.Append(@"</table>
+</body>
+</html>");
+
+            Response.Clear();
+            Response.ContentType = "application/pdf";
+            Response.AddHeader("content-disposition", "attachment;filename=" + "PDFfile.pdf");
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Response.BinaryWrite(GeneratePDF(sb.ToString()));
+            Response.End();
+        }
+
 
         protected override void Dispose(bool disposing)
         {

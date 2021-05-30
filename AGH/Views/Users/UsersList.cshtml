@@ -27,7 +27,9 @@
             <th>
                 Role
             </th>
-            <th></th>
+            <th>
+                Action
+            </th>
         </tr>
     </thead>
 @foreach (var item in Model) {
@@ -61,4 +63,5 @@
 
 <div style="direction:rtl">
     @Html.ActionLink("Add a new user", "CreateUser", null, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Export To PDF", "DownloadPDF", null, new { @class = "btn btn-info" })
 </div>

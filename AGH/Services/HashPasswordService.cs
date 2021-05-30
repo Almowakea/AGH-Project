@@ -35,14 +35,15 @@ namespace AGH.Services
         }
         
 
-        public static bool CompareHash(string enteredPassword, string salt, string storedPassword)
+        public static bool CompareHash(string enteredPassword, string storedSalt, string storedPassword)
         {
 
             using (SHA512 sha512Hash = SHA512.Create())
             {
-                //Append entered password with stored salt & hash them
-                byte[] hashBytes = sha512Hash.ComputeHash(Encoding.UTF8.GetBytes(enteredPassword + salt));
+                // Append entered password with stored salt & hash them
+                byte[] hashBytes = sha512Hash.ComputeHash(Encoding.UTF8.GetBytes(enteredPassword + storedSalt));
 
+                // Converting hashed byte array back to string format
                 enteredPassword = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
             }
 
