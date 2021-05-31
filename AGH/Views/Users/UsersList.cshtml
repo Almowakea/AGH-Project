@@ -27,38 +27,114 @@
             <th>
                 Role
             </th>
-            <th></th>
+            <th>
+                Action
+            </th>
         </tr>
     </thead>
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.User_First_Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.User_Last_Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.User_Phone_Number)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.User_Email)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.User_ID)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.User_Type.Type)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "EditUser", new { id=item.ID }) |
-            @Html.ActionLink("Details", "UserDetails", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "DeleteUser", new { id=item.ID })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.User_First_Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User_Last_Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User_Phone_Number)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User_Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User_ID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User_Type.Type)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "EditUser", new { id = item.ID }) |
+                @Html.ActionLink("Details", "UserDetails", new { id = item.ID }) |
+
+                <a href="#" class="delete"
+                   data-id="@item.ID" 
+                   data-controller="Users"
+                   data-action="DeleteConfirmed"
+                   data-body-message="'@item.User_First_Name @item.User_Last_Name'">Delete
+                </a>
+            </td>
+        </tr>
+    }
 </table>
 
 <div style="direction:rtl">
     @Html.ActionLink("Add a new user", "CreateUser", null, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Export To PDF", "DownloadPDF", null, new { @class = "btn btn-info" })
 </div>
+
+
+@section scripts{
+    
+<script>
+
+    $(document).ready(function () {
+        var url;
+        var redirectUrl;
+        var target;
+
+        $('body').append(`
+                    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title" id="myModalLabel">Delete User</h3>
+                        </div>
+                        <div class="modal-body delete-modal-body" style="font-size: 2rem">
+                            
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" id="cancel-delete">Cancel</button>
+                            <button type="button" class="btn btn-danger" id="confirm-delete">Delete</button>
+                        </div>
+                        </div>
+                    </div>
+                    </div>`);
+
+        //Delete Action
+        $(".delete").on('click', (e) => {
+            e.preventDefault();
+
+            target = e.target;
+            var Id = $(target).data('id');
+            var controller = $(target).data('controller');
+            var action = $(target).data('action');
+            var userMessage = $(target).data('body-message');
+            var bodyMessage = "Are you sure you want to delete the user ";
+            redirectUrl = $(target).data('redirect-url');
+
+            url = "/" + controller + "/" + action + "/" + Id;
+            $(".delete-modal-body").text(bodyMessage + userMessage + '?');
+            $("#deleteModal").modal('show');
+        });
+
+        $("#confirm-delete").on('click', () => {
+            $.post(url)
+                .done((result) => {
+                    if (!redirectUrl) {
+                        return $(target).parent().parent().hide("slow");
+                    }
+                    window.location.href = redirectUrl;
+                })
+                .fail((error) => {
+                    if (redirectUrl)
+                        window.location.href = redirectUrl;
+                }).always(() => {
+                    $("#deleteModal").modal('hide');
+                });
+        });
+    });
+
+</script>
+
+    }

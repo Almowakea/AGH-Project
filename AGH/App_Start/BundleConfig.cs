@@ -24,9 +24,10 @@ namespace AGH
                         "~/Scripts/modernizr-*"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                      "~/Content/bootstrap.css",
-                      "~/Content/datatables/css/datatables.bootstrap.css",
-                      "~/Content/site.css"));
+                "~/Content/site.css",
+                "~/Content/bootstrap.css",
+                "~/Content/datatables/css/datatables.bootstrap.css"
+                      ));
         }
     }
 }

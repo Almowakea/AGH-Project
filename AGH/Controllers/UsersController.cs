@@ -6,6 +6,13 @@ using System.Net;
 using System.Web.Mvc;
 using AGH.Services;
 using AGH.Models;
+using iTextSharp.text;
+using System.Web;
+using System.IO;
+using iTextSharp.text.pdf;
+using iTextSharp.text.html.simpleparser;
+using System.Text;
+using iTextSharp.tool.xml;
 
 namespace AGH.Controllers
 {
@@ -20,15 +27,16 @@ namespace AGH.Controllers
             try
             {
                 var users = db.Users.Include(u => u.User_Type).Where(u => u.Is_User_Deleted != true);
+
                 return View(users.ToList());
             }
-               
+
             catch (Exception e)
             {
                 ViewBag.ErrorMessage = e.Message;
                 return View("Error");
             }
-            
+
         }
 
         // GET: Users/Details/5
@@ -126,13 +134,13 @@ namespace AGH.Controllers
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
                 }
-            
+
                 if (user is null)
                 {
                     return HttpNotFound();
                 }
 
-                return View(user);    
+                return View(user);
             }
 
             catch (Exception e)
@@ -170,7 +178,7 @@ namespace AGH.Controllers
             try
             {
                 User user = db.Users.Find(id);
-                
+
                 if (id is null)
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -183,28 +191,29 @@ namespace AGH.Controllers
 
                 return View(user);
             }
-            catch (Exception)
+
+            catch (Exception e)
             {
-                //One way of throwing exception "Didn't generalize because it reveals info to users"
-                throw new Exception("delete operation unsuccessful (user not found)");
+                ViewBag.ErrorMessage = e.Message;
+                return View("Error");
             }
         }
 
         // POST: Users/Delete/5
-        [HttpPost, ActionName("DeleteUser")]
-        [ValidateAntiForgeryToken]
+        [HttpPost]
         public ActionResult DeleteConfirmed(int id)
         {
             try
             {
                 User user = db.Users.Find(id);
 
-                
-
                 user.Is_User_Deleted = true;
+
                 db.SaveChanges();
+
                 return RedirectToAction("UsersList");
             }
+
             catch (Exception e)
             {
                 ViewBag.ErrorMessage = e.Message;
@@ -212,6 +221,111 @@ namespace AGH.Controllers
             }
 
         }
+
+        public byte[] GeneratePDF(string pHTML)
+        {
+            byte[] bytePDF = null;
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                StringReader txtReader = new StringReader(pHTML);
+
+                // itextsharp object from document class
+                using (Document doc = new Document(PageSize.A4, 25, 25, 25, 25)) // Page size & margins
+                {
+                    // Create an itextsharp pdfWriter that listens to the document and directs an XML-stream to a file
+                    using (PdfWriter oPdfWriter = PdfWriter.GetInstance(doc, ms))
+                    {
+                        // Open document and start the worker on the document
+                        doc.Open();
+
+                        // Create an XML worker to parse the document
+                        XMLWorkerHelper.GetInstance().ParseXHtml(oPdfWriter, doc, txtReader);
+
+                        doc.Close();
+
+                        bytePDF = ms.ToArray();
+
+                        return bytePDF;
+                    }
+                }
+            }
+        }
+
+        public void DownloadPDF()
+        {
+            string tableStyle = "cellpadding='3' cellspacing='0' style='border: 1px solid #ccc;font-size: 14pt;' align='center'";
+
+            string thStyle = "style='background-color: #d9edf7; border: 1px solid #ccc; font-weight:bold'";
+
+            string tdStyle = "style='width: 120px; border: 1px solid #ccc;'";
+
+            try
+            {
+                #region Mark-up string
+                var sb = new StringBuilder();
+                sb.Append($@"<html>
+<head>
+</head>
+<body>
+<table {tableStyle}>
+        <tr>
+            <th {thStyle}>
+                First Name
+            </th>
+            <th {thStyle}>
+                Last Name
+            </th>
+            <th {thStyle}>
+                Phone Number
+            </th>
+            <th {thStyle}>
+                Email
+            </th>
+            <th {thStyle}>
+                ID Number
+            </th>
+            <th {thStyle}>
+                Role
+            </th>
+        </tr>");
+
+                var users = db.Users.Include(u => u.User_Type).Where(u => u.Is_User_Deleted != true);
+
+                foreach (var user in users)
+                {
+                    sb.AppendFormat($@"<tr>
+<td {tdStyle}>{user.User_First_Name}</td>
+<td {tdStyle}>{user.User_Last_Name}</td>
+<td {tdStyle}>{user.User_Phone_Number}</td>
+<td {tdStyle}>{user.User_Email}</td>
+<td {tdStyle}>{user.User_ID}</td>
+<td {tdStyle}>{user.User_Type.Type}</td>
+    </tr>");
+                }
+
+                sb.Append(@"</table>
+</body>
+</html>");
+
+                Response.Clear();
+                Response.ContentType = "application/pdf";
+                Response.AddHeader("content-disposition", "attachment;filename=" + "Users-List.pdf");
+                Response.Cache.SetCacheability(HttpCacheability.NoCache);
+                Response.BinaryWrite(GeneratePDF(sb.ToString()));
+                Response.End();
+                #endregion
+            }
+
+            catch (Exception e)
+            {
+                //ViewBag.ErrorMessage = e.Message;
+
+                throw new Exception(e.Message);
+            }
+            
+        }
+
 
         protected override void Dispose(bool disposing)
         {
