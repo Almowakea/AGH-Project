@@ -191,16 +191,16 @@ namespace AGH.Controllers
 
                 return View(user);
             }
-            catch (Exception)
+
+            catch (Exception e)
             {
-                //One way of throwing exception "Didn't generalize because it reveals info to users"
-                throw new Exception("delete operation unsuccessful (user not found)");
+                ViewBag.ErrorMessage = e.Message;
+                return View("Error");
             }
         }
 
         // POST: Users/Delete/5
-        [HttpPost, ActionName("DeleteUser")]
-        [ValidateAntiForgeryToken]
+        [HttpPost]
         public ActionResult DeleteConfirmed(int id)
         {
             try
