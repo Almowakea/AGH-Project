@@ -12,6 +12,7 @@ using System.IO;
 using iTextSharp.text.pdf;
 using iTextSharp.text.html.simpleparser;
 using System.Text;
+using iTextSharp.tool.xml;
 
 namespace AGH.Controllers
 {
@@ -227,32 +228,20 @@ namespace AGH.Controllers
 
             using (MemoryStream ms = new MemoryStream())
             {
-                TextReader txtReader = new StringReader(pHTML);
+                StringReader txtReader = new StringReader(pHTML);
 
                 // itextsharp object from document class
-                // Page size & margins
-                using (Document doc = new Document(PageSize.A4, 25, 25, 25, 25))
+                using (Document doc = new Document(PageSize.A4, 25, 25, 25, 25)) // Page size & margins
                 {
                     // Create an itextsharp pdfWriter that listens to the document and directs an XML-stream to a file
                     using (PdfWriter oPdfWriter = PdfWriter.GetInstance(doc, ms))
                     {
-
-                        // Create a worker to parse the document
-                        HTMLWorker htmlWorker = new HTMLWorker(doc);
-
                         // Open document and start the worker on the document
                         doc.Open();
 
-                        doc.HtmlStyleClass = "table";
+                        // Create an XML worker to parse the document
+                        XMLWorkerHelper.GetInstance().ParseXHtml(oPdfWriter, doc, txtReader);
 
-                        htmlWorker.StartDocument();
-
-                        // Parse the html into the document
-                        htmlWorker.Parse(txtReader);
-
-                        // Close the document and the worker
-                        htmlWorker.EndDocument();
-                        htmlWorker.Close();
                         doc.Close();
 
                         bytePDF = ms.ToArray();
@@ -265,58 +254,76 @@ namespace AGH.Controllers
 
         public void DownloadPDF()
         {
-            //string HTMLContent = "Hello <b>World</b>";
-            var sb = new StringBuilder();
-            sb.Append(@"<html>
+            string tableStyle = "cellpadding='3' cellspacing='0' style='border: 1px solid #ccc;font-size: 14pt;' align='center'";
+
+            string thStyle = "style='background-color: #d9edf7; border: 1px solid #ccc; font-weight:bold'";
+
+            string tdStyle = "style='width: 120px; border: 1px solid #ccc;'";
+
+            try
+            {
+                #region Mark-up string
+                var sb = new StringBuilder();
+                sb.Append($@"<html>
 <head>
 </head>
 <body>
-<table class='table bordered'>
+<table {tableStyle}>
         <tr>
-            <th>
+            <th {thStyle}>
                 First Name
             </th>
-            <th>
+            <th {thStyle}>
                 Last Name
             </th>
-            <th>
+            <th {thStyle}>
                 Phone Number
             </th>
-            <th>
+            <th {thStyle}>
                 Email
             </th>
-            <th>
+            <th {thStyle}>
                 ID Number
             </th>
-            <th>
+            <th {thStyle}>
                 Role
             </th>
         </tr>");
 
-            var users = db.Users.Include(u => u.User_Type).Where(u => u.Is_User_Deleted != true);
+                var users = db.Users.Include(u => u.User_Type).Where(u => u.Is_User_Deleted != true);
 
-            foreach (var user in users)
-            {
-                sb.AppendFormat($@"<tr>
-<td>{user.User_First_Name}</td>
-<td>{user.User_Last_Name}</td>
-<td>{user.User_Phone_Number}</td>
-<td>{user.User_Email}</td>
-<td>{user.User_ID}</td>
-<td>{user.User_Type.Type}</td>
+                foreach (var user in users)
+                {
+                    sb.AppendFormat($@"<tr>
+<td {tdStyle}>{user.User_First_Name}</td>
+<td {tdStyle}>{user.User_Last_Name}</td>
+<td {tdStyle}>{user.User_Phone_Number}</td>
+<td {tdStyle}>{user.User_Email}</td>
+<td {tdStyle}>{user.User_ID}</td>
+<td {tdStyle}>{user.User_Type.Type}</td>
     </tr>");
-            }
+                }
 
-            sb.Append(@"</table>
+                sb.Append(@"</table>
 </body>
 </html>");
 
-            Response.Clear();
-            Response.ContentType = "application/pdf";
-            Response.AddHeader("content-disposition", "attachment;filename=" + "PDFfile.pdf");
-            Response.Cache.SetCacheability(HttpCacheability.NoCache);
-            Response.BinaryWrite(GeneratePDF(sb.ToString()));
-            Response.End();
+                Response.Clear();
+                Response.ContentType = "application/pdf";
+                Response.AddHeader("content-disposition", "attachment;filename=" + "Users-List.pdf");
+                Response.Cache.SetCacheability(HttpCacheability.NoCache);
+                Response.BinaryWrite(GeneratePDF(sb.ToString()));
+                Response.End();
+                #endregion
+            }
+
+            catch (Exception e)
+            {
+                //ViewBag.ErrorMessage = e.Message;
+
+                throw new Exception(e.Message);
+            }
+            
         }
 
 

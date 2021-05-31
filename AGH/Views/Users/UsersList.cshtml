@@ -32,33 +32,34 @@
             </th>
         </tr>
     </thead>
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.User_First_Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.User_Last_Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.User_Phone_Number)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.User_Email)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.User_ID)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.User_Type.Type)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "EditUser", new { id=item.ID }) |
-            @Html.ActionLink("Details", "UserDetails", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "DeleteUser", new { id=item.ID })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.User_First_Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User_Last_Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User_Phone_Number)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User_Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User_ID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User_Type.Type)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "EditUser", new { id = item.ID }) |
+                @Html.ActionLink("Details", "UserDetails", new { id = item.ID }) |
+                @Html.ActionLink("Delete", "DeleteUser", new { id = item.ID })
+            </td>
+        </tr>
+    }
 </table>
 
 <div style="direction:rtl">
